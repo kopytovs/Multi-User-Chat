@@ -14,7 +14,7 @@ import java.util.Date;
 
 public class ChatServer {
 
-    private static final int PORT = 7777;
+    private static final int PORT = 7774;
 
     private static HashSet<String> names = new HashSet<String>();
 
@@ -44,6 +44,7 @@ public class ChatServer {
 
         public void run() {
             try {
+                String history = "";
 
                 in = new BufferedReader(new InputStreamReader(
                         socket.getInputStream()));
@@ -58,6 +59,12 @@ public class ChatServer {
                     synchronized (names) {
                         if (!names.contains(name)) {
                             names.add(name);
+                            for (PrintWriter writer : writers) {
+                                Date now = new Date();
+                                DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                                String time = formatter.format(now);
+                                writer.println("MESSAGE " + name + "<" + time + ">" + ": " + "Зашел(а) в чат.");
+                            }
                             break;
                         }
                     }
@@ -66,6 +73,10 @@ public class ChatServer {
                 out.println("NAMEACCEPTED");
                 writers.add(out);
 
+                //if (in.readLine().startsWith("NEEDHISTORY")){
+                //    writers
+                //}
+
                 while (true) {
                     String input = in.readLine();
                     if (input == null) {
@@ -73,10 +84,10 @@ public class ChatServer {
                     }
                     Date now = new Date();
                     DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                    String time;
+                    String time = formatter.format(now);
                     for (PrintWriter writer : writers) {
-                        time = formatter.format(now);
                         writer.println("MESSAGE " + name + "<" + time + ">" + ": " + input);
+                        //history += name + "<" + time + ">" + ": " + input;
                     }
                 }
             } catch (IOException e) {
@@ -84,6 +95,12 @@ public class ChatServer {
             } finally {
 
                 if (name != null) {
+                    for (PrintWriter writer : writers) {
+                        Date now = new Date();
+                        DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                        String time = formatter.format(now);
+                        writer.println("MESSAGE " + name + "<" + time + ">" + ": " + "Вышел(ла) из чата");
+                    }
                     names.remove(name);
                 }
                 if (out != null) {

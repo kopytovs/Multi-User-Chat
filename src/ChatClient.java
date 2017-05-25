@@ -19,7 +19,7 @@ public class ChatClient {
 
     BufferedReader in;
     PrintWriter out;
-    JFrame frame = new JFrame("Chatter");
+    JFrame frame = new JFrame("Многопользовательский чат");
     JTextField textField = new JTextField(40);
     JTextArea messageArea = new JTextArea(8, 40);
 
@@ -60,7 +60,7 @@ public class ChatClient {
     private void run() throws IOException {
 
         String serverAddress = getServerAddress();
-        Socket socket = new Socket(serverAddress, 7777);
+        Socket socket = new Socket(serverAddress, 7774);
         in = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
@@ -71,7 +71,8 @@ public class ChatClient {
                 out.println(getName());
             } else if (line.startsWith("NAMEACCEPTED")) {
                 textField.setEditable(true);
-            } else if (line.startsWith("MESSAGE")) {
+                //out.println("NEEDHISTORY");
+            }else if (line.startsWith("MESSAGE")) {
                 messageArea.append(line.substring(8) + "\n");
             }
         }
